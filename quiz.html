@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Brainy Buddies Quiz Party</title>
+<style>
+  :root{
+    --ink:#2d2250; --soft:#6b5f9a;
+    --sun:#ffc800; --mint:#2ed8a3; --pink:#ff4fa3; --peach:#ff8a3d; --purple:#8f5cff; --blue:#2fa8ff; --red:#ff5a5a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{
+    font-family:"Comic Sans MS","Chalkboard SE","Trebuchet MS",system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,#ff9a8b,#ffd86f 22%,#7be0c3 46%,#6bb8ff 70%,#c58bff);
+    background-size:300% 300%; background-attachment:fixed; overflow-x:hidden;
+    animation:bgshift 18s ease-in-out infinite;
+  }
+  @keyframes bgshift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .float{position:absolute;opacity:.85;animation:drift linear infinite}
+  @keyframes drift{from{transform:translateX(-20vw) rotate(0)}to{transform:translateX(120vw) rotate(360deg)}}
+
+  header{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:10px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:1.2rem}
+  .hud{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .pill{background:#fff;color:var(--ink);padding:7px 13px;border-radius:999px;font-size:.9rem;border:3px solid var(--ink);cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 3px 0 var(--ink)}
+  .pill:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+  .pill.static{cursor:default}
+  #musicBtn{background:#d4ffe6}#sfxBtn{background:#ffe3a8}
+  .bar{position:relative;z-index:2;height:16px;background:#fff;margin:0 18px;border-radius:12px;border:3px solid var(--ink);overflow:hidden}
+  .bar i{display:block;height:100%;width:100%;background:var(--mint);transition:width .1s linear,background .3s}
+
+  main{position:relative;z-index:2;max-width:760px;margin:18px auto 40px;padding:0 16px}
+  .card{background:linear-gradient(180deg,#ffffff,#fff6e6);border:4px solid var(--ink);border-top:14px solid var(--pink);border-radius:28px;padding:22px 22px 26px;box-shadow:0 8px 0 var(--ink);animation:rise .45s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(14px) rotate(-.6deg)}to{opacity:1;transform:none}}
+  h1,h2{margin:.2em 0 .4em;text-align:center}
+  h1{font-size:2.3rem;background:linear-gradient(90deg,#ff5a5a,#ff8a3d,#e0a800,#12b886,#1b6fe0,#8f5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .sub{color:var(--soft);text-align:center;margin:.3em 0 1em}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  button.big{font-family:inherit;font-size:1.15rem;font-weight:700;border-radius:18px;padding:14px 24px;cursor:pointer;color:var(--ink);border:3px solid var(--ink);background:var(--sun);box-shadow:0 5px 0 var(--ink);transition:transform .1s}
+  button.big:hover{transform:translateY(-2px)} button.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+  button.big.alt{background:var(--mint)}
+
+  .hero{font-size:5rem;text-align:center;animation:bob 2.6s ease-in-out infinite;line-height:1}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-10px) rotate(4deg)}}
+  .cats{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px;margin-top:10px}
+  .cat{font-family:inherit;border:3px solid var(--ink);border-radius:20px;padding:14px 8px;text-align:center;cursor:pointer;color:var(--ink);font-weight:700;box-shadow:0 5px 0 var(--ink);transition:transform .12s}
+  .cat:hover{transform:translateY(-4px) rotate(-1.5deg)}
+  .cat .e{font-size:2.6rem;display:block}
+  .cat small{display:block;font-weight:400;color:#3d3560;margin-top:3px}
+
+  .stats{display:flex;justify-content:space-between;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  .stat{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:5px 12px;font-weight:700;box-shadow:0 3px 0 var(--ink)}
+  .mrow{display:flex;align-items:center;gap:12px}
+  .mascot{font-size:3.2rem;line-height:1;transition:transform .2s}
+  .mascot.jump{animation:jump .6s}
+  @keyframes jump{30%{transform:translateY(-18px) rotate(-8deg) scale(1.2)}60%{transform:translateY(0) rotate(6deg)}}
+  .bubble{position:relative;background:#fff3c9;border:3px solid var(--ink);border-radius:18px;padding:8px 14px;font-weight:700;flex:1}
+  .bubble:before{content:"";position:absolute;left:-12px;top:50%;margin-top:-8px;border:8px solid transparent;border-right:12px solid var(--ink)}
+  .qemoji{font-size:4rem;text-align:center;margin-top:10px;animation:bob 3s ease-in-out infinite}
+  .qtext{font-size:1.5rem;margin:.2em 0 .7em;text-align:center;color:var(--ink)}
+  .opts{display:grid;gap:12px}
+  button.opt{font-family:inherit;font-size:1.2rem;font-weight:700;text-align:left;border-radius:18px;padding:14px 18px;cursor:pointer;color:var(--ink);border:3px solid var(--ink);box-shadow:0 5px 0 var(--ink);transition:transform .1s,opacity .3s;display:flex;gap:12px;align-items:center}
+  button.opt .k{background:#fff;border:3px solid var(--ink);border-radius:10px;min-width:34px;height:34px;display:inline-flex;align-items:center;justify-content:center}
+  button.opt:nth-child(1){background:#ffd6d6}
+  button.opt:nth-child(2){background:#fff0a8}
+  button.opt:nth-child(3){background:#cfeaff}
+  button.opt:hover:not(:disabled){transform:translateY(-3px) scale(1.01)}
+  button.opt.right{background:#b8f5d6!important;animation:hop .5s}
+  button.opt.wrong{background:#ffc9c9!important;animation:shake .35s}
+  button.opt.gone{opacity:.15;pointer-events:none}
+  button.opt:disabled{cursor:default}
+  @keyframes shake{25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+  @keyframes hop{30%{transform:translateY(-12px) scale(1.04)}}
+  .life{display:flex;gap:10px;justify-content:center;margin-top:16px}
+  .life button{font-family:inherit;font-weight:700;border:3px solid var(--ink);border-radius:999px;padding:7px 14px;background:#e6dcff;cursor:pointer;box-shadow:0 3px 0 var(--ink)}
+  .life button:disabled{opacity:.4;cursor:default}
+  .fact{margin-top:16px;background:#fff3c9;border:3px solid var(--ink);border-radius:16px;padding:12px 14px;animation:rise .4s}
+  .fact b{display:block;margin-bottom:2px}
+  .result-stars{font-size:3rem;text-align:center;letter-spacing:6px}
+  .big-score{font-size:3rem;text-align:center;font-weight:700;color:var(--pink)}
+  .badge{display:inline-block;background:var(--sun);border:3px solid var(--ink);border-radius:999px;padding:6px 18px;font-weight:700;font-size:1.2rem}
+  .grid2{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:14px 0}
+  .grid2 div{background:#fff;border:3px solid var(--ink);border-radius:14px;padding:8px;text-align:center;font-weight:700}
+  .grid2 span{display:block;font-size:1.5rem;color:var(--purple)}
+  footer{position:relative;z-index:2;text-align:center;color:var(--ink);font-size:.85rem;padding-bottom:24px}
+
+  .fall{position:fixed;top:-60px;z-index:30;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(115vh) rotate(var(--rot))}}
+  .conf{position:fixed;top:-20px;z-index:30;pointer-events:none;width:10px;height:16px;animation:fall linear forwards}
+  .pts{position:fixed;z-index:35;pointer-events:none;font-size:2rem;font-weight:700;color:#12b886;text-shadow:0 2px 0 #fff,0 0 8px #fff;animation:ptsup 1.2s forwards}
+  @keyframes ptsup{to{transform:translateY(-90px) scale(1.4);opacity:0}}
+  @media (max-width:520px){.qtext{font-size:1.25rem}button.opt{font-size:1.05rem}.grid2{grid-template-columns:1fr}}
+  @media (prefers-reduced-motion:reduce){.float,.hero,.qemoji,body{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="deco" id="deco" aria-hidden="true"></div>
+
+<header>
+  <div class="brand">🧠 Brainy Buddies Quiz Party</div>
+  <div class="hud">
+    <button class="pill on" id="musicBtn" title="Background music">🎵 Music: on</button>
+    <button class="pill on" id="sfxBtn" title="Sound effects">🔔 Sounds: on</button>
+  </div>
+</header>
+<div class="bar" aria-hidden="true"><i id="timerFill"></i></div>
+
+<main id="app" aria-live="polite"></main>
+<footer>Learn, laugh and level up! · Tip: press 1, 2 or 3 on your keyboard to answer</footer>
+
+<script>
+/* =====================  QUESTIONS  ===================== */
+/* [emoji, question, correct answer, wrong 1, wrong 2, fun fact] */
+const CATS={
+ animals:{name:"Animals",emoji:"🐾",color:"#ffb27a",qs:[
+  ["🦒","Which animal is the tallest in the world?","Giraffe","Elephant","Camel","A giraffe can grow up to 5 or 6 metres tall. Its long neck helps it munch leaves at the very top of trees!"],
+  ["🕷️","How many legs does a spider have?","8","6","10","Spiders have 8 legs. Insects have 6, so spiders are not insects. They are arachnids!"],
+  ["🦘","What is a baby kangaroo called?","Joey","Cub","Puppy","A joey lives in its mum's pouch for months while it grows big and strong."],
+  ["🐧","Which bird cannot fly but is a super swimmer?","Penguin","Eagle","Parrot","Penguins use their strong flippers like wings to zoom through the water."],
+  ["🐼","What do giant pandas mostly eat?","Bamboo","Fish","Honey","Pandas spend many hours every day munching bamboo!"],
+  ["🐆","Which is the fastest land animal?","Cheetah","Lion","Horse","A cheetah can sprint at about 100 km/h, as fast as a car on a highway, but only for a short time."],
+  ["🐙","How many hearts does an octopus have?","3","1","8","An octopus has 3 hearts and blue blood!"],
+  ["🦁","Which big cat is called the 'King of the Jungle'?","Lion","Tiger","Leopard","Lions actually live in grasslands, not jungles, and they live in family groups called prides."]
+ ]},
+ space:{name:"Space",emoji:"🚀",color:"#b9aaff",qs:[
+  ["🔴","Which planet is called the Red Planet?","Mars","Venus","Jupiter","Mars looks red because its dust and rocks contain lots of rusty iron."],
+  ["☀️","What is the closest star to Earth?","The Sun","The Moon","The North Star","The Sun is a star! It is about 150 million kilometres away."],
+  ["🪐","How many planets are in our Solar System?","8","7","9","The eight planets are Mercury, Venus, Earth, Mars, Jupiter, Saturn, Uranus and Neptune."],
+  ["💍","Which planet is famous for its big, bright rings?","Saturn","Mars","Mercury","Saturn's rings are made of billions of pieces of ice and rock."],
+  ["🌠","What is a 'shooting star' really?","A space rock burning up in the sky","A star falling down","A flying firefly","It is called a meteor. A tiny space rock zooms into our air and glows as it burns up."],
+  ["👨‍🚀","Who was the first person to walk on the Moon?","Neil Armstrong","Buzz Lightyear","Yuri Gagarin","Neil Armstrong stepped onto the Moon in 1969. Yuri Gagarin was the first person to travel into space!"],
+  ["🍎","What force keeps our feet on the ground?","Gravity","Magic","Wind","Gravity pulls things toward the Earth. Without it we would float away like astronauts!"],
+  ["🌍","How long does Earth take to travel once around the Sun?","One year","One day","One month","Earth zooms around the Sun in about 365 days. That is one year!"]
+ ]},
+ science:{name:"Science",emoji:"🔬",color:"#a6f0d6",qs:[
+  ["🌱","What do plants need to make their food?","Sunlight, water and air","Candy and juice","Only soil","Plants use sunlight to turn water and air (carbon dioxide) into food. This is called photosynthesis!"],
+  ["🧊","At what temperature does water freeze?","0°C","50°C","100°C","Water freezes at 0°C and boils at 100°C."],
+  ["💨","Which gas do we breathe in to stay alive?","Oxygen","Helium","Smoke","Plants make oxygen for us. Thank you, trees!"],
+  ["💎","What is the hardest natural material on Earth?","Diamond","Gold","Wood","Diamonds are so hard they are used to cut other materials."],
+  ["🧲","Which of these will a magnet pick up?","A steel paper clip","A wooden spoon","A piece of paper","Magnets attract things containing iron, like steel paper clips and nails."],
+  ["🌈","How many colours are in a rainbow?","7","5","10","Red, orange, yellow, green, blue, indigo and violet. Rainbows appear when sunlight shines through raindrops!"],
+  ["🥕","Animals that eat only plants are called...","Herbivores","Carnivores","Insects","Cows, rabbits and elephants are herbivores. Lions are carnivores (meat eaters)."],
+  ["🌳","Which part of a plant drinks water from the soil?","Roots","Flowers","Leaves","Roots hold the plant in place and soak up water and minerals."]
+ ]},
+ world:{name:"World",emoji:"🌍",color:"#9fd6ff",qs:[
+  ["🌊","Which is the biggest ocean on Earth?","Pacific Ocean","Atlantic Ocean","Indian Ocean","The Pacific Ocean is bigger than all of Earth's land put together!"],
+  ["🗺️","Which is the largest continent?","Asia","Africa","Europe","Asia has the most people of any continent, and it is also home to Mount Everest!"],
+  ["🏛️","What is the capital city of India?","New Delhi","Mumbai","Kolkata","New Delhi is where India's Parliament and the President's house are."],
+  ["🗼","In which country is the Eiffel Tower?","France","Italy","Japan","The Eiffel Tower is in Paris. It was finished in 1889."],
+  ["🏜️","On which continent is the Sahara Desert?","Africa","Australia","South America","The Sahara is the largest hot desert in the world."],
+  ["🐅","Which animal is the national animal of India?","Tiger","Lion","Elephant","It is the Bengal tiger. India's national bird is the peacock!"],
+  ["🌎","How many continents are there?","7","5","9","Asia, Africa, North America, South America, Antarctica, Europe and Australia (Oceania)."],
+  ["🏔️","Which is the tallest mountain above sea level?","Mount Everest","Mount Fuji","Kilimanjaro","Mount Everest is about 8,849 metres high. It is in the Himalayas."]
+ ]},
+ body:{name:"My Body",emoji:"💪",color:"#ffb3d6",qs:[
+  ["🦴","How many bones does a grown-up have?","206","106","306","Babies are born with about 300 bones. Some join together as they grow!"],
+  ["❤️","Which body part pumps blood around your body?","Heart","Lungs","Stomach","Your heart beats about 100,000 times every day."],
+  ["🧠","Which body part helps you think and remember?","Brain","Elbow","Liver","Your brain controls everything you do, even while you sleep."],
+  ["🦷","How many teeth does a grown-up usually have?","32","20","50","Kids first get 20 baby teeth. They fall out and adult teeth grow in."],
+  ["🫁","Which body parts help you breathe?","Lungs","Kidneys","Ears","Your lungs take oxygen from the air you breathe in."],
+  ["🥛","Which food helps build strong bones?","Milk","Fizzy drinks","Sweets","Milk has calcium, which helps bones and teeth grow strong."],
+  ["🖐️","How many senses do people usually talk about?","5","3","10","Sight, hearing, smell, taste and touch."],
+  ["🧍","What is the biggest organ of the human body?","Skin","Heart","Brain","Your skin covers your whole body and protects you."]
+ ]}
+};
+const MIX_COUNT=10, TIME_LIMIT=15;
+
+/* =====================  HELPERS  ===================== */
+const app=document.getElementById("app");
+const fill=document.getElementById("timerFill");
+function h(html){const d=document.createElement("div");d.innerHTML=html.trim();return d.firstChild;}
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
+function pick(a){return a[Math.floor(Math.random()*a.length)];}
+function getBest(cat){try{return +localStorage.getItem("bbq_best_"+cat)||0;}catch(e){return 0;}}
+function setBest(cat,v){try{localStorage.setItem("bbq_best_"+cat,v);}catch(e){}}
+function toQ(a){return{e:a[0],q:a[1],correct:a[2],opts:shuffle([a[2],a[3],a[4]]),fact:a[5]};}
+
+/* background floaters */
+(function(){
+  const d=document.getElementById("deco"),items=["⭐","☁️","🎈","🌈","✨","🎵","🦋","🍭"];
+  for(let i=0;i<10;i++){
+    const c=document.createElement("div");c.className="float";c.textContent=items[i%items.length];
+    c.style.top=(Math.random()*85)+"%";c.style.fontSize=(1.8+Math.random()*2.2)+"rem";
+    c.style.animationDuration=(35+Math.random()*40)+"s";c.style.animationDelay=(-Math.random()*60)+"s";
+    d.appendChild(c);
+  }
+})();
+
+/* =====================  AUDIO  ===================== */
+let ctx=null, sfxGain=null, musicGain=null, musicOn=true, sfxOn=true;
+function initAudio(){
+  if(ctx){ if(ctx.state==="suspended") ctx.resume(); return; }
+  try{
+    ctx=new (window.AudioContext||window.webkitAudioContext)();
+    const comp=ctx.createDynamicsCompressor(); comp.connect(ctx.destination);
+    sfxGain=ctx.createGain(); sfxGain.gain.value=0.7; sfxGain.connect(comp);
+    musicGain=ctx.createGain(); musicGain.gain.value=0.0001; musicGain.connect(comp);
+  }catch(e){ctx=null;}
+}
+function tone(type,f0,f1,t,dur,vol,dest,lp){
+  if(!ctx) return;
+  const o=ctx.createOscillator(),g=ctx.createGain(),f=ctx.createBiquadFilter();
+  o.type=type;o.frequency.setValueAtTime(f0,t);
+  if(f1&&f1!==f0)o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  f.type="lowpass";f.frequency.value=lp||6000;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(vol,t+Math.min(0.02,dur/3));
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(f);f.connect(g);g.connect(dest||sfxGain);o.start(t);o.stop(t+dur+0.05);
+}
+/* sound effects */
+function sPop(){ if(!ctx||!sfxOn) return; const t=ctx.currentTime;
+  tone("sine",900,260,t,0.09,0.5); tone("triangle",1500,500,t,0.05,0.15); }
+function sCorrect(streak){ if(!ctx||!sfxOn) return; const t=ctx.currentTime+0.02;
+  [523.25,659.25,783.99,1046.5].forEach((f,i)=>{tone("triangle",f,f,t+i*0.09,0.35,0.35);tone("sine",f*2,f*2,t+i*0.09,0.2,0.08);});
+  if(streak>=3) [1318.5,1568,2093].forEach((f,i)=>tone("sine",f,f,t+0.4+i*0.08,0.3,0.15)); }
+function sWrong(){ if(!ctx||!sfxOn) return; const t=ctx.currentTime+0.02;
+  tone("sawtooth",330,250,t,0.22,0.22,null,900);
+  tone("sawtooth",250,160,t+0.2,0.4,0.22,null,700); }
+function sTick(){ if(!ctx||!sfxOn) return; tone("square",1300,1300,ctx.currentTime,0.04,0.12); }
+function sFanfare(){ if(!ctx||!sfxOn) return; const t=ctx.currentTime+0.05;
+  [523.25,659.25,783.99,659.25,783.99,1046.5].forEach((f,i)=>{tone("triangle",f,f,t+i*0.14,0.4,0.35);tone("sine",f*2,f*2,t+i*0.14,0.3,0.08);}); }
+function sLife(){ if(!ctx||!sfxOn) return; const t=ctx.currentTime; tone("sine",600,1200,t,0.18,0.3); tone("sine",900,1800,t+0.1,0.18,0.25); }
+
+/* background music: bouncy, light, kid-friendly loop (original) */
+const N={C3:130.81,A2:110,F2:87.31,G2:98,C5:523.25,D5:587.33,E5:659.25,F5:698.46,G5:783.99,A5:880,B5:987.77,C6:1046.5};
+const MEL=[
+  N.E5,0,N.G5,N.E5,N.C5,0,N.E5,N.G5,
+  N.A5,0,N.G5,0,N.E5,N.G5,N.E5,0,
+  N.A5,N.C6,N.A5,0,N.F5,N.A5,N.G5,0,
+  N.D5,0,N.G5,0,N.B5,N.G5,N.F5,N.D5
+];
+const BASSLINE={0:N.C3,4:N.C3,8:N.A2,12:N.A2,16:N.F2,20:N.F2,24:N.G2,28:N.G2};
+const BPM=116, STEP=60/BPM/2;
+let nextT=0, stepI=0, musicTimer=null, noiseBuf=null;
+function shaker(t){
+  if(!noiseBuf){noiseBuf=ctx.createBuffer(1,ctx.sampleRate*0.06,ctx.sampleRate);const d=noiseBuf.getChannelData(0);for(let i=0;i<d.length;i++)d[i]=Math.random()*2-1;}
+  const s=ctx.createBufferSource(),hp=ctx.createBiquadFilter(),g=ctx.createGain();
+  s.buffer=noiseBuf;hp.type="highpass";hp.frequency.value=7000;
+  g.gain.setValueAtTime(0.06,t);g.gain.exponentialRampToValueAtTime(0.0001,t+0.05);
+  s.connect(hp);hp.connect(g);g.connect(musicGain);s.start(t);
+}
+function playStep(i,t){
+  const m=MEL[i%32];
+  if(m){tone("triangle",m,m,t,0.32,0.30,musicGain,3500);tone("sine",m*2,m*2,t,0.15,0.06,musicGain);}
+  const b=BASSLINE[i%32];
+  if(b) tone("sine",b,b,t,0.45,0.55,musicGain,500);
+  if(i%2===1) shaker(t);
+}
+function scheduler(){
+  if(!ctx) return;
+  while(nextT<ctx.currentTime+0.3){playStep(stepI,nextT);nextT+=STEP;stepI++;}
+}
+function startMusic(){
+  if(!ctx||!musicOn||musicTimer) return;
+  nextT=ctx.currentTime+0.1;
+  musicGain.gain.cancelScheduledValues(ctx.currentTime);
+  musicGain.gain.setValueAtTime(Math.max(musicGain.gain.value,0.0001),ctx.currentTime);
+  musicGain.gain.exponentialRampToValueAtTime(0.16,ctx.currentTime+1.5);
+  musicTimer=setInterval(scheduler,100);
+}
+function stopMusic(){
+  if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  if(ctx){musicGain.gain.cancelScheduledValues(ctx.currentTime);musicGain.gain.setTargetAtTime(0.0001,ctx.currentTime,0.25);}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) stopMusic(); else if(musicOn&&ctx) startMusic(); });
+
+/* =====================  EFFECTS  ===================== */
+function confetti(big){
+  const candy=["🎉","⭐","🍬","🍭","🎈","✨"], colors=["#ff6b6b","#ffd24d","#7fdcb8","#6db3f2","#ff9ec4","#b794f6"];
+  const nE=big?26:8, nC=big?80:30;
+  for(let i=0;i<nE;i++){
+    const e=document.createElement("div");e.className="fall";e.textContent=pick(candy);
+    e.style.left=Math.random()*100+"vw";e.style.fontSize=(1.4+Math.random()*1.4)+"rem";
+    e.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    e.style.animationDuration=(2+Math.random()*1.8)+"s";e.style.animationDelay=(Math.random()*0.7)+"s";
+    document.body.appendChild(e);setTimeout(()=>e.remove(),5000);
+  }
+  for(let i=0;i<nC;i++){
+    const e=document.createElement("div");e.className="conf";
+    e.style.left=Math.random()*100+"vw";e.style.background=pick(colors);
+    e.style.borderRadius=Math.random()>.5?"50%":"2px";
+    e.style.setProperty("--rot",(Math.random()*900-450)+"deg");
+    e.style.animationDuration=(1.6+Math.random()*1.8)+"s";e.style.animationDelay=(Math.random()*0.7)+"s";
+    document.body.appendChild(e);setTimeout(()=>e.remove(),4200);
+  }
+}
+function floatPts(txt,el){
+  const r=el.getBoundingClientRect();
+  const p=document.createElement("div");p.className="pts";p.textContent=txt;
+  p.style.left=(r.left+r.width/2-30)+"px";p.style.top=(r.top)+"px";
+  document.body.appendChild(p);setTimeout(()=>p.remove(),1300);
+}
+
+/* =====================  GAME STATE  ===================== */
+let G=null, timerId=null;
+function stopTimer(){if(timerId){clearInterval(timerId);timerId=null;}}
+
+/* =====================  SCREENS  ===================== */
+function showHome(){
+  stopTimer(); fill.style.width="100%"; fill.style.background="var(--mint)";
+  app.innerHTML="";
+  const catBtns=Object.entries(CATS).map(([k,c])=>
+    `<button class="cat" data-cat="${k}" style="background:${c.color}"><span class="e">${c.emoji}</span>${c.name}<small>${c.qs.length} questions · best ${getBest(k)}</small></button>`).join("");
+  const mixBest=getBest("mix");
+  const c=h(`<section class="card">
+    <div class="hero">🦊</div>
+    <h1>Brainy Buddies Quiz Party</h1>
+    <p class="sub">Hi, I'm Professor Fox! Pick a topic, beat the clock and collect stars!</p>
+    <div class="cats">${catBtns}
+      <button class="cat" data-cat="mix" style="background:#ffe27a"><span class="e">🎲</span>Surprise Mix<small>${MIX_COUNT} questions · best ${mixBest}</small></button>
+    </div>
+  </section>`);
+  app.appendChild(c);
+  c.querySelectorAll(".cat").forEach(b=>b.onclick=()=>{initAudio();sPop();startMusic();startGame(b.dataset.cat);});
+}
+
+function startGame(catKey){
+  let list;
+  if(catKey==="mix"){
+    list=shuffle(Object.values(CATS).flatMap(c=>c.qs)).slice(0,MIX_COUNT);
+  }else list=shuffle(CATS[catKey].qs);
+  G={cat:catKey,qs:list.map(toQ),i:0,score:0,streak:0,bestStreak:0,right:0,
+     left:TIME_LIMIT,limit:TIME_LIMIT,answered:false,fifty:true,time:true};
+  showQuestion();
+}
+
+function hudHtml(){
+  return `<div class="stats">
+    <span class="stat">Question ${G.i+1} / ${G.qs.length}</span>
+    <span class="stat" id="streakStat">🔥 Streak ${G.streak}</span>
+    <span class="stat" id="scoreStat">⭐ ${G.score}</span>
+  </div>`;
+}
+
+function showQuestion(){
+  const q=G.qs[G.i];
+  G.answered=false;G.limit=TIME_LIMIT;G.left=TIME_LIMIT;
+  app.innerHTML="";
+  const card=h(`<section class="card">
+    ${hudHtml()}
+    <div class="mrow"><div class="mascot" id="mascot">🦊</div><div class="bubble" id="bubble">${G.i===0?"Let's go! Pick the best answer!":pick(["Next one! You can do it!","Ooh, this one is fun!","Think think think... 🤔","Ready? Here we go!"])}</div></div>
+    <div class="qemoji">${q.e}</div>
+    <h2 class="qtext">${q.q}</h2>
+    <div class="opts" id="opts"></div>
+    <div class="life">
+      <button id="ll50" ${G.fifty?"":"disabled"}>✂️ 50/50</button>
+      <button id="llTime" ${G.time?"":"disabled"}>⏱️ +5 sec</button>
+    </div>
+    <div id="slot"></div>
+  </section>`);
+  app.appendChild(card);
+  const opts=card.querySelector("#opts");
+  q.opts.forEach((o,idx)=>{
+    const b=h(`<button class="opt" data-i="${idx}"><span class="k">${idx+1}</span><span>${o}</span></button>`);
+    b.onclick=()=>answer(idx);
+    opts.appendChild(b);
+  });
+  card.querySelector("#ll50").onclick=function(){
+    if(G.answered||!G.fifty) return;
+    G.fifty=false;this.disabled=true;sLife();
+    const wrongs=[...opts.querySelectorAll(".opt")].filter(b=>q.opts[+b.dataset.i]!==q.correct);
+    shuffle(wrongs)[0].classList.add("gone");
+    setBubble("Two left! Choose wisely 😉");
+  };
+  card.querySelector("#llTime").onclick=function(){
+    if(G.answered||!G.time) return;
+    G.time=false;this.disabled=true;sLife();
+    G.left+=5;G.limit+=5;
+    setBubble("Bonus time! ⏱️ +5 seconds");
+  };
+  sPop();
+  startTimer();
+}
+
+function setBubble(t){const b=document.getElementById("bubble");if(b)b.textContent=t;}
+function setMascot(e){const m=document.getElementById("mascot");if(!m)return;m.textContent=e;m.classList.remove("jump");void m.offsetWidth;m.classList.add("jump");}
+
+function startTimer(){
+  stopTimer();
+  let lastWhole=Math.ceil(G.left);
+  fill.style.width="100%";fill.style.background="var(--mint)";
+  timerId=setInterval(()=>{
+    if(G.answered){stopTimer();return;}
+    G.left=Math.max(0,G.left-0.1);
+    const pct=G.left/G.limit*100;
+    fill.style.width=pct+"%";
+    fill.style.background=pct>50?"var(--mint)":pct>25?"var(--sun)":"var(--red)";
+    const whole=Math.ceil(G.left);
+    if(whole!==lastWhole){lastWhole=whole;if(whole<=5&&whole>0)sTick();}
+    if(G.left<=0){stopTimer();timeUp();}
+  },100);
+}
+
+function reveal(chosenIdx){
+  const q=G.qs[G.i];
+  const btns=[...document.querySelectorAll("#opts .opt")];
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(q.opts[i]===q.correct) b.classList.add("right");
+    else if(i===chosenIdx) b.classList.add("wrong");
+  });
+  document.getElementById("ll50").disabled=true;
+  document.getElementById("llTime").disabled=true;
+  const slot=document.getElementById("slot");
+  const last=G.i===G.qs.length-1;
+  const f=h(`<div class="fact"><b>💡 Fun fact</b>${q.fact}</div>`);
+  const row=h(`<div class="row"><button class="big" id="next">${last?"See my results 🏆":"Next question →"}</button></div>`);
+  slot.appendChild(f);slot.appendChild(row);
+  row.querySelector("#next").onclick=()=>{sPop();next();};
+  row.querySelector("#next").focus({preventScroll:true});
+  f.scrollIntoView({behavior:"smooth",block:"center"});
+}
+
+function refreshHud(){
+  const s=document.getElementById("scoreStat"),k=document.getElementById("streakStat");
+  if(s)s.textContent="⭐ "+G.score; if(k)k.textContent="🔥 Streak "+G.streak;
+}
+
+function answer(idx){
+  if(G.answered) return;
+  initAudio();
+  G.answered=true;stopTimer();
+  const q=G.qs[G.i];
+  const ok=q.opts[idx]===q.correct;
+  const btn=document.querySelector(`#opts .opt[data-i="${idx}"]`);
+  if(ok){
+    G.right++;G.streak++;G.bestStreak=Math.max(G.bestStreak,G.streak);
+    const bonusT=Math.round(G.left/G.limit*50);
+    const bonusS=G.streak>=2?Math.min(G.streak,6)*5:0;
+    const pts=100+bonusT+bonusS;
+    G.score+=pts;
+    sCorrect(G.streak);confetti(false);
+    floatPts("+"+pts,btn);
+    setMascot("🥳");
+    setBubble(G.streak>=3?`🔥 ${G.streak} in a row! Unstoppable!`:pick(["Woohoo! You got it!","Brilliant!","Super smart!","Ding ding ding!"]));
+  }else{
+    G.streak=0;
+    sWrong();
+    setMascot("🤗");
+    setBubble(pick(["Oops! Good try!","Almost! Let's learn it together!","No worries, we learn something new!"]));
+  }
+  refreshHud();
+  reveal(idx);
+}
+
+function timeUp(){
+  if(G.answered) return;
+  G.answered=true;G.streak=0;
+  sWrong();setMascot("⏰");setBubble("Tick tock! Time's up! Here's the answer.");
+  refreshHud();reveal(-1);
+}
+
+function next(){
+  G.i++;
+  if(G.i>=G.qs.length) showResult(); else showQuestion();
+}
+
+function showResult(){
+  stopTimer();fill.style.width="100%";fill.style.background="var(--mint)";
+  const total=G.qs.length;
+  const pct=Math.round(G.right/total*100);
+  const stars=pct>=90?3:pct>=60?2:1;
+  const title=pct>=90?"🏆 Quiz Champion":pct>=70?"🌟 Super Brain":pct>=50?"🔍 Smart Explorer":"🌱 Curious Learner";
+  const msg=pct>=90?"Wow! You are a genius!":pct>=70?"Great job! You know so much!":pct>=50?"Nice work! Every quiz makes you smarter.":"Good effort! Try again and beat your score!";
+  const prev=getBest(G.cat), newBest=G.score>prev;
+  if(newBest) setBest(G.cat,G.score);
+  app.innerHTML="";
+  const c=h(`<section class="card">
+    <div class="hero">${pct>=70?"🥳":"🦊"}</div>
+    <h2>Quiz complete!</h2>
+    <div class="result-stars">${"⭐".repeat(stars)}${"☆".repeat(3-stars)}</div>
+    <div class="big-score">${G.score} points</div>
+    <p class="sub"><span class="badge">${title}</span></p>
+    <p class="sub">${msg}${newBest?" 🎉 New high score!":""}</p>
+    <div class="grid2">
+      <div><span>${G.right}/${total}</span>Correct</div>
+      <div><span>🔥 ${G.bestStreak}</span>Best streak</div>
+      <div><span>${Math.max(prev,G.score)}</span>High score</div>
+    </div>
+    <div class="row">
+      <button class="big" id="again">Play again 🔁</button>
+      <button class="big alt" id="home">Choose topic 🎯</button>
+    </div>
+  </section>`);
+  app.appendChild(c);
+  c.querySelector("#again").onclick=()=>{sPop();startGame(G.cat);};
+  c.querySelector("#home").onclick=()=>{sPop();showHome();};
+  sFanfare();confetti(true);
+}
+
+/* =====================  CONTROLS  ===================== */
+document.getElementById("musicBtn").onclick=function(){
+  initAudio();musicOn=!musicOn;
+  this.classList.toggle("on",musicOn);this.textContent="🎵 Music: "+(musicOn?"on":"off");
+  sPop(); if(musicOn) startMusic(); else stopMusic();
+};
+document.getElementById("sfxBtn").onclick=function(){
+  initAudio();sfxOn=!sfxOn;
+  this.classList.toggle("on",sfxOn);this.textContent="🔔 Sounds: "+(sfxOn?"on":"off");
+  sPop();
+};
+document.addEventListener("keydown",e=>{
+  if(!G) return;
+  if(["1","2","3"].includes(e.key)&&!G.answered&&document.getElementById("opts")){
+    const b=document.querySelector(`#opts .opt[data-i="${+e.key-1}"]`);
+    if(b&&!b.classList.contains("gone")) answer(+e.key-1);
+  }
+});
+
+showHome();
+</script>
+</body>
+</html>

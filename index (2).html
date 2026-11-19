@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tula's Midnight Jungle Adventure</title>
+<style>
+  :root{
+    --card:#ffffff; --ink:#2d2250; --soft:#6b5f9a;
+    --pip:#2fa8ff; --pipd:#1b6fe0; --sun:#ffc800; --mint:#2ed8a3; --pink:#ff4fa3; --peach:#ff8a3d; --purple:#8f5cff; --red:#ff5a5a;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{
+    font-family:"Comic Sans MS","Chalkboard SE","Trebuchet MS",system-ui,sans-serif;
+    color:var(--ink);
+    background:linear-gradient(135deg,#ff9a8b,#ffd86f 22%,#7be0c3 46%,#6bb8ff 70%,#c58bff);
+    background-size:300% 300%; background-attachment:fixed; overflow-x:hidden;
+    animation:bgshift 18s ease-in-out infinite;
+  }
+  @keyframes bgshift{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+  .deco{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+  .cloud{position:absolute;font-size:3.2rem;opacity:.85;animation:drift linear infinite}
+  @keyframes drift{from{transform:translateX(-20vw)}to{transform:translateX(120vw)}}
+  #dim{position:fixed;inset:0;background:#1a1440;opacity:0;pointer-events:none;transition:opacity .6s;z-index:20}
+  body.dim #dim{opacity:.5}
+
+  header{position:relative;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:14px 18px;gap:10px;flex-wrap:wrap}
+  .brand{font-weight:700;font-size:1.15rem}
+  .hud{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+  .pill{background:#fff;color:var(--ink);padding:7px 13px;border-radius:999px;font-size:.9rem;border:3px solid var(--ink);cursor:pointer;font-family:inherit;font-weight:700;box-shadow:0 3px 0 var(--ink)}
+  .pill:active{transform:translateY(2px);box-shadow:0 1px 0 var(--ink)}
+  #readBtn{background:#ffd1e8}#autoBtn{background:#d6f5ff}#dimBtn{background:#e0d4ff}#musicBtn{background:#d4ffe6}
+  #voiceSel{max-width:170px;background:#fff3b8}
+  .bar{position:relative;z-index:2;height:12px;background:#fff;margin:0 18px;border-radius:12px;border:3px solid var(--ink);overflow:hidden}
+  .bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#ff5a5a,#ff8a3d,#ffc800,#2ed8a3,#2fa8ff,#8f5cff);transition:width .5s}
+
+  main{position:relative;z-index:2;max-width:720px;margin:20px auto 40px;padding:0 16px}
+  .card{background:linear-gradient(180deg,#ffffff,#fff6e6);border:4px solid var(--ink);border-top:14px solid var(--pink);border-radius:28px;padding:26px 24px;box-shadow:0 8px 0 var(--ink);animation:rise .45s ease}
+  @keyframes rise{from{opacity:0;transform:translateY(14px) rotate(-.6deg)}to{opacity:1;transform:none}}
+  .scene{width:120px;height:120px;margin:0 auto 8px;display:flex;align-items:center;justify-content:center;font-size:3.4rem;border-radius:50%;background:radial-gradient(circle,#fff6b8,#ffd6ec 70%,#d9ccff);border:4px solid var(--ink);animation:bob 3s ease-in-out infinite}
+  @keyframes bob{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-8px) rotate(3deg)}}
+  h1,h2{margin:.2em 0 .4em;text-align:center;background:linear-gradient(90deg,#ff5a5a,#ff8a3d,#e0a800,#12b886,#1b6fe0,#8f5cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  h1{font-size:2.2rem} h2{font-size:1.6rem}
+  p.story{font-size:1.2rem;line-height:1.65;margin:.6em 0 1em}
+  .sub{color:var(--soft);text-align:center}
+  .row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+  button.big,button.opt{font-family:inherit;font-size:1.1rem;font-weight:700;border-radius:18px;padding:14px 22px;cursor:pointer;color:var(--ink);border:3px solid var(--ink);transition:transform .1s, box-shadow .1s}
+  button.big{background:var(--sun);box-shadow:0 5px 0 var(--ink)}
+  button.big.alt{background:var(--pink)} button.big.alt2{background:var(--mint)}
+  button.big:hover{transform:translateY(-2px)} button.big:active{transform:translateY(3px);box-shadow:0 2px 0 var(--ink)}
+  .q{margin-top:18px;background:#f1e8ff;border:3px dashed var(--purple);border-radius:20px;padding:16px}
+  .q h3{margin:0 0 10px;font-size:1.2rem}
+  .opts{display:grid;gap:10px}
+  button.opt{background:#fff;text-align:left;box-shadow:0 4px 0 var(--ink)}
+  .opts button.opt:nth-child(1){background:#ffe0e0}
+  .opts button.opt:nth-child(2){background:#fff1b8}
+  .opts button.opt:nth-child(3){background:#d8f0ff}
+  button.opt:hover{filter:brightness(1.06);transform:translateY(-2px)}
+  button.opt.right{background:#c9f5e1!important;animation:hop .5s}
+  button.opt.wrong{background:#ffdcdc!important;animation:shake .3s}
+  @keyframes shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+  @keyframes hop{30%{transform:translateY(-10px) scale(1.03)}}
+  .hint{min-height:1.4em;margin-top:8px;color:#c0425c;font-weight:700}
+  .fact{margin-top:16px;background:#fff3c9;border:3px solid var(--ink);border-radius:16px;padding:12px 14px;animation:rise .4s}
+  .fact b{display:block;margin-bottom:2px}
+  .score{font-size:2.4rem;text-align:center;letter-spacing:6px;margin:8px 0}
+  .badge{display:inline-block;background:var(--pink);border:3px solid var(--ink);border-radius:999px;padding:6px 16px;font-weight:700}
+  footer{position:relative;z-index:2;text-align:center;color:var(--ink);font-size:.85rem;padding-bottom:24px}
+
+  .fall{position:fixed;top:-60px;z-index:30;pointer-events:none;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(115vh) rotate(var(--rot))}}
+  .conf{position:fixed;top:-20px;z-index:30;pointer-events:none;width:10px;height:16px;animation:fall linear forwards}
+  .banner{position:fixed;left:50%;top:22%;transform:translateX(-50%) scale(0);z-index:31;pointer-events:none;
+    font-size:2rem;font-weight:700;background:#fff;border:4px solid var(--ink);border-radius:24px;padding:12px 24px;box-shadow:0 6px 0 var(--ink);animation:banner 1.8s forwards;text-align:center}
+  @keyframes banner{15%{transform:translateX(-50%) scale(1.1)}25%{transform:translateX(-50%) scale(1)}85%{transform:translateX(-50%) scale(1);opacity:1}100%{transform:translateX(-50%) scale(.9);opacity:0}}
+  .animalpop{position:fixed;left:50%;top:52%;transform:translate(-50%,-50%) scale(0);z-index:32;pointer-events:none;text-align:center;animation:apop 1.6s forwards}
+  .animalpop .em{font-size:7rem;line-height:1;filter:drop-shadow(0 6px 0 rgba(45,34,80,.35))}
+  .animalpop .wd{display:inline-block;margin-top:6px;font-size:1.6rem;font-weight:700;background:#fff;border:4px solid var(--ink);border-radius:20px;padding:6px 18px;box-shadow:0 5px 0 var(--ink)}
+  @keyframes apop{0%{transform:translate(-50%,-50%) scale(0) rotate(-15deg)}20%{transform:translate(-50%,-50%) scale(1.25) rotate(8deg)}35%{transform:translate(-50%,-50%) scale(1) rotate(-5deg)}50%{transform:translate(-50%,-55%) scale(1.08) rotate(4deg)}85%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(.8);opacity:0}}
+  @media (prefers-reduced-motion:reduce){.cloud,.scene,body{animation:none!important}}
+</style>
+</head>
+<body>
+<div class="deco" aria-hidden="true" id="deco"></div>
+<div id="dim" aria-hidden="true"></div>
+
+<header>
+  <div class="brand">🐘 Tula's Jungle Adventure</div>
+  <div class="hud">
+    <span class="pill" id="starCount" aria-label="Stars collected">⭐ 0</span>
+    <button class="pill" id="readBtn" title="Read this page aloud">🔊 Read to me</button>
+    <button class="pill on" id="autoBtn" title="Read automatically">🗣️ Auto-read: on</button>
+    <button class="pill on" id="musicBtn" title="Soft sleepy music">🎵 Music: on</button>
+    <select class="pill" id="voiceSel" title="Pick the most natural voice" aria-label="Choose a voice"><option>Default voice</option></select>
+    <button class="pill" id="dimBtn" title="Dim the lights">🕯️ Dim lights</button>
+  </div>
+</header>
+<div class="bar" aria-hidden="true"><i id="prog"></i></div>
+
+<main id="app" aria-live="polite"></main>
+<footer>A bedtime story game with fun jungle facts · Best enjoyed with a grown-up nearby</footer>
+
+<script>
+/* ---------- Story data ---------- */
+const nodes = {
+  jungle: {
+    scene:"🐘🌙", title:"Chapter 1: Tula Can't Sleep",
+    text:"Deep in the jungle, the moon peeked through the tall green trees. All the elephants in the herd were snoring softly, except little Tula. \"Mama, I'm not sleepy!\" she whispered. Her wise old grandma opened one eye and smiled. \"Big elephants don't need much sleep, my dear. Just a little nap, and we are ready for tomorrow.\"",
+    q:{ask:"How much do wild elephants sleep each night?",
+       options:[
+         {t:"Only about 2 to 4 hours", ok:true},
+         {t:"20 hours, like a kitten", hint:"That's a LOT of sleeping! Elephants sleep much less. Try again!"},
+         {t:"They never sleep, not even a minute", hint:"Everybody needs a little sleep! Try again!"}
+       ]},
+    fact:{h:"Did you know?", t:"Wild elephants sleep only about 2 to 4 hours a night. That is less than almost any other land animal! Many of them even sleep standing up."},
+    next:"choose"
+  },
+  choose: {
+    scene:"🗺️✨", title:"Where should Tula explore?",
+    text:"Tula tiptoed away from the sleepy herd. Two paths glowed in the moonlight. One climbed up toward the tall treetops, where tiny eyes were blinking. The other wound down to the river, where a funny song was echoing. Which one should Tula choose?",
+    choices:[
+      {t:"🌳 The tall treetops", next:"treetops", cls:"alt"},
+      {t:"🌊 The singing river", next:"river", cls:"alt2"}
+    ]
+  },
+  treetops: {
+    scene:"🐒🌳", title:"Chapter 2: Bibi the Bush Baby",
+    text:"High in the branches sat a tiny fluffy creature with enormous round eyes and big, big ears. \"Hello, Tula! I'm Bibi the bush baby!\" Her ears twitched this way and that. \"Shh, listen... I can hear a little beetle crawling on the other side of this tree!\"",
+    q:{ask:"What do Bibi's big ears help her do at night?",
+       options:[
+         {t:"Fly like an airplane", hint:"Ha! Bibi can't fly with her ears. Try again!"},
+         {t:"Hear tiny sounds in the dark", ok:true},
+         {t:"Keep her warm like a hat", hint:"Cozy idea, but not quite! Try again!"}
+       ]},
+    fact:{h:"Did you know?", t:"Bush babies are nocturnal, which means they are awake at night. Their big ears help them hear tiny insects, and their huge eyes help them see in the dark."},
+    next:"bats"
+  },
+  river: {
+    scene:"🐸🌿", title:"Chapter 2: Rio the Tree Frog",
+    text:"At the riverbank, a little green frog sat on a leaf, puffing out his throat like a balloon. \"Ribbit, ribbit, ribbit!\" he sang. \"Hello, Tula! I'm Rio! Isn't my song wonderful?\" All around, other frogs started singing too, until the whole river was a giant, happy choir.",
+    q:{ask:"Why do frogs sing so loudly at night?",
+       options:[
+         {t:"To scare away the moon", hint:"The moon isn't scared of anything! Try again!"},
+         {t:"Because they are practicing for a concert", hint:"Fun idea, but no! Try again!"},
+         {t:"To call to other frogs", ok:true}
+       ]},
+    fact:{h:"Did you know?", t:"Frogs sing to call to other frogs. Each kind of frog has its own special song, so they can find friends of their own kind, even in the dark. The puffed-up throat makes the sound louder."},
+    next:"bats"
+  },
+  bats: {
+    scene:"🦇🍌", title:"Chapter 3: The Fruit Bats",
+    text:"Whoosh! A flock of fruit bats swooped over Tula's head, carrying juicy figs and mangoes. \"Hello, Tula!\" they squeaked. \"We're the jungle's night gardeners! We munch the fruit, then fly far, far away.\" Plop! A tiny seed fell from a bat and landed softly in the soil. Tula wondered what would happen next.",
+    q:{ask:"How do fruit bats help the jungle grow?",
+       options:[
+         {t:"They water the trees with their wings", hint:"Not quite! Try again!"},
+         {t:"They spread seeds so new trees can grow", ok:true},
+         {t:"They sing songs to the plants", hint:"What a funny picture, but no! Try again!"}
+       ]},
+    fact:{h:"Did you know?", t:"Fruit bats carry seeds far away from the parent tree. The seeds fall to the ground and grow into new trees. They plant forests while everyone else is asleep!"},
+    next:"herd"
+  },
+  herd: {
+    scene:"🐘💕", title:"Chapter 4: Mama's Secret Rumble",
+    text:"Tula wandered a long way and suddenly felt a little lost. \"Mama?\" she whispered. She stood very still. Deep in the ground, she felt a gentle \"brrrrrrrm\" tickle her toes. It was her grandma's low rumble, calling her home. \"I'm coming!\" Tula said, and she followed the rumble all the way back.",
+    q:{ask:"How can elephants talk to friends who are far away?",
+       options:[
+         {t:"With very low rumbles that travel far", ok:true},
+         {t:"By sending text messages", hint:"Elephants don't have phones! Try again!"},
+         {t:"By waving their tails really fast", hint:"Wiggly, but they can't see that far! Try again!"}
+       ]},
+    fact:{h:"Did you know?", t:"Elephants make low rumbles that humans can barely hear. These sounds travel through the air and the ground, and elephants can feel them through their feet, even from many kilometres away."},
+    next:"end"
+  }
+};
+const TOTAL_STEPS = 6;
+
+/* ---------- State ---------- */
+let stars = 0, step = 0, usedHint = false, autoRead = true;
+const app = document.getElementById("app");
+const prog = document.getElementById("prog");
+const starCount = document.getElementById("starCount");
+
+/* ---------- Decoration ---------- */
+(function(){
+  const d=document.getElementById("deco"), items=["☁️","🍃","⭐","🦋","🌙","🌴"];
+  for(let i=0;i<8;i++){
+    const c=document.createElement("div");c.className="cloud";c.textContent=items[i%items.length];
+    c.style.top=(Math.random()*70)+"%";c.style.animationDuration=(40+Math.random()*40)+"s";
+    c.style.animationDelay=(-Math.random()*60)+"s";c.style.fontSize=(2+Math.random()*2.5)+"rem";
+    d.appendChild(c);
+  }
+})();
+
+/* ---------- Helpers ---------- */
+function h(html){const d=document.createElement("div");d.innerHTML=html.trim();return d.firstChild;}
+function setProgress(){prog.style.width=Math.min(100,(step/TOTAL_STEPS)*100)+"%";}
+function updateStars(){starCount.textContent="⭐ "+stars;}
+function shuffle(a){return a.map(v=>[Math.random(),v]).sort((x,y)=>x[0]-y[0]).map(x=>x[1]);}
+
+/* ---------- Voice ----------
+   1) If a recorded human file exists (audio/<key>.mp3) it is played.
+   2) Otherwise the most natural voice on the device is used (no extreme
+      pitch-shifting, which is what makes speech sound robotic).
+      Use the menu in the top bar to pick the best-sounding voice. */
+let voices=[], chosenVoice=null, curAudio=null, curKey="intro";
+const sel=document.getElementById("voiceSel");
+function vscore(v){
+  const n=v.name; if(!/^en/i.test(v.lang)) return -1; let s=0;
+  if(/\bana\b/i.test(n)&&/natural|online/i.test(n)) s+=100;
+  if(/natural|neural/i.test(n)) s+=50;
+  if(/premium|enhanced/i.test(n)) s+=40;
+  if(/online/i.test(n)) s+=20;
+  if(/google/i.test(n)) s+=15;
+  if(/aria|jenny|samantha|ava|allison|karen|moira|tessa|libby|sonia|zira/i.test(n)) s+=10;
+  if(/female/i.test(n)) s+=3;
+  if(/espeak|compact|novelty|bad news|bubbles|whisper|zarvox|trinoids/i.test(n)) s-=60;
+  return s;
+}
+function loadVoices(){
+  if(!("speechSynthesis" in window)) return;
+  voices=speechSynthesis.getVoices().filter(v=>vscore(v)>=0).sort((a,b)=>vscore(b)-vscore(a));
+  if(!voices.length) return;
+  sel.innerHTML=voices.map((v,i)=>`<option value="${i}">${v.name}</option>`).join("");
+  let saved=null; try{saved=localStorage.getItem("tulaVoice");}catch(e){}
+  const idx=voices.findIndex(v=>v.name===saved);
+  sel.value=idx>=0?idx:0; chosenVoice=voices[sel.value]||null;
+}
+loadVoices();
+if("speechSynthesis" in window) speechSynthesis.onvoiceschanged=loadVoices;
+sel.onchange=()=>{
+  chosenVoice=voices[sel.value]||null;
+  try{localStorage.setItem("tulaVoice",chosenVoice.name);}catch(e){}
+  speak("Hi! I'm your story voice. Let's go!");
+};
+function speak(text){
+  if(!("speechSynthesis" in window)) return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(text);
+  if(chosenVoice) u.voice=chosenVoice;
+  u.pitch=1.08; u.rate=0.95; u.volume=1;
+  speechSynthesis.speak(u);
+}
+function narrate(key,text){
+  stopSpeak();
+  const a=new Audio("audio/"+key+".mp3"); curAudio=a;
+  let used=false;
+  const fallback=()=>{ if(used) return; used=true; if(curAudio===a) speak(text); };
+  a.onerror=fallback;
+  a.play().catch(fallback);
+}
+function stopSpeak(){
+  if(curAudio){try{curAudio.pause();}catch(e){} curAudio=null;}
+  if("speechSynthesis" in window) speechSynthesis.cancel();
+}
+function cardText(){
+  const card=app.querySelector(".card"); if(!card) return "";
+  return [...card.querySelectorAll("h1,h2,p.story,.q h3")].map(e=>e.textContent).join(". ");
+}
+
+/* ---------- Cheer sound ---------- */
+let actx;
+function cheer(big){
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const notes = big ? [523,659,784,1047,1319] : [523,659,784];
+    notes.forEach((f,i)=>{
+      const o=actx.createOscillator(), g=actx.createGain();
+      o.type="triangle"; o.frequency.value=f;
+      const t=actx.currentTime+i*0.09;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.18,t+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+0.25);
+      o.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+0.3);
+    });
+  }catch(e){}
+}
+
+/* ---------- Reward: candy + confetti shower ---------- */
+function shower(big){
+  const candy=["🍬","🍭","🍫","🍩","🧁","🍪","🎉","⭐"];
+  const colors=["#ff6b6b","#ffd24d","#7fdcb8","#6db3f2","#ff9ec4","#b794f6"];
+  const nCandy = big?38:12, nConf = big?70:25;
+  for(let i=0;i<nCandy;i++){
+    const e=document.createElement("div");e.className="fall";e.textContent=candy[Math.floor(Math.random()*candy.length)];
+    e.style.left=Math.random()*100+"vw";e.style.fontSize=(1.6+Math.random()*1.6)+"rem";
+    e.style.setProperty("--rot",(Math.random()*720-360)+"deg");
+    e.style.animationDuration=(2.2+Math.random()*2)+"s";e.style.animationDelay=(Math.random()*0.9)+"s";
+    document.body.appendChild(e);setTimeout(()=>e.remove(),5500);
+  }
+  for(let i=0;i<nConf;i++){
+    const e=document.createElement("div");e.className="conf";
+    e.style.left=Math.random()*100+"vw";e.style.background=colors[Math.floor(Math.random()*colors.length)];
+    e.style.borderRadius=Math.random()>.5?"50%":"2px";
+    e.style.setProperty("--rot",(Math.random()*900-450)+"deg");
+    e.style.animationDuration=(1.8+Math.random()*2)+"s";e.style.animationDelay=(Math.random()*0.8)+"s";
+    document.body.appendChild(e);setTimeout(()=>e.remove(),4500);
+  }
+  const msgs = big ? ["Yay! You got it! 🎉","Super smart! 🌟","Wow, amazing! 🍭","Hooray! 🎊"] : ["Good job! 💛","Nice try-again win! 👏"];
+  const b=document.createElement("div");b.className="banner";b.textContent=msgs[Math.floor(Math.random()*msgs.length)];
+  document.body.appendChild(b);setTimeout(()=>b.remove(),1900);
+  cheer(big);
+}
+
+/* ---------- Animal sounds ----------
+   If you add a real recording named audio/sfx-<animal>.mp3 (elephant, rumble,
+   bushbaby, frog, bat) it is played; otherwise a synthesized sound is used. */
+const ANIMAL={
+  jungle:["elephant","🐘","Paaa-rooo!"],
+  treetops:["bushbaby","🐒","Chirp chirp!"],
+  river:["frog","🐸","Ribbit ribbit!"],
+  bats:["bat","🦇","Eek eek!"],
+  herd:["rumble","🐘","Brrrrm..."],
+  end:["elephant","🐘","Paaa-rooo!"]
+};
+function getCtx(){ actx = actx || new (window.AudioContext||window.webkitAudioContext)(); if(actx.state==="suspended") actx.resume(); return actx; }
+function blip(type,f0,f1,t,dur,peak,lp){
+  const o=actx.createOscillator(),g=actx.createGain(),f=actx.createBiquadFilter();
+  o.type=type;o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);
+  f.type="lowpass";f.frequency.value=lp||4000;
+  g.gain.setValueAtTime(0.0001,t);
+  g.gain.exponentialRampToValueAtTime(peak,t+Math.min(0.03,dur/3));
+  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
+  o.connect(f);f.connect(g);g.connect(actx.destination);o.start(t);o.stop(t+dur+0.05);
+}
+function synthAnimal(kind){
+  const c=getCtx(), t=c.currentTime+0.05;
+  if(kind==="elephant"){            // trumpet
+    [1,1.012].forEach(m=>{
+      const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter(),l=c.createOscillator(),lg=c.createGain();
+      o.type="sawtooth";
+      o.frequency.setValueAtTime(260*m,t);
+      o.frequency.exponentialRampToValueAtTime(640*m,t+0.35);
+      o.frequency.exponentialRampToValueAtTime(430*m,t+0.95);
+      l.frequency.value=22;lg.gain.value=16;l.connect(lg);lg.connect(o.frequency);
+      f.type="bandpass";f.frequency.value=1100;f.Q.value=0.7;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.25,t+0.08);
+      g.gain.setValueAtTime(0.25,t+0.65);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+1.05);
+      o.connect(f);f.connect(g);g.connect(c.destination);
+      o.start(t);l.start(t);o.stop(t+1.1);l.stop(t+1.1);
+    });
+  }else if(kind==="rumble"){        // low elephant rumble
+    [1,2,3].forEach((m,i)=>{
+      const o=c.createOscillator(),g=c.createGain(),f=c.createBiquadFilter(),l=c.createOscillator(),lg=c.createGain();
+      o.type="sawtooth";o.frequency.setValueAtTime(85*m,t);o.frequency.linearRampToValueAtTime(65*m,t+1.4);
+      l.frequency.value=14;lg.gain.value=4*m;l.connect(lg);lg.connect(o.frequency);
+      f.type="lowpass";f.frequency.value=450;
+      g.gain.setValueAtTime(0.0001,t);
+      g.gain.exponentialRampToValueAtTime(0.28/(i+1),t+0.25);
+      g.gain.exponentialRampToValueAtTime(0.0001,t+1.5);
+      o.connect(f);f.connect(g);g.connect(c.destination);
+      o.start(t);l.start(t);o.stop(t+1.55);l.stop(t+1.55);
+    });
+  }else if(kind==="frog"){          // ribbit ribbit
+    [0,0.16,0.4,0.56].forEach((d,i)=>{
+      blip("square",i%2?260:200,i%2?200:150,t+d,0.1,0.2,900);
+      blip("square",i%2?390:300,i%2?300:225,t+d,0.1,0.08,1400);
+    });
+  }else if(kind==="bushbaby"){      // quick chirps
+    [0,0.11,0.22,0.33,0.55].forEach((d,i)=>blip("sine",1800+i*90,2900+i*120,t+d,i===4?0.2:0.07,0.18,6000));
+  }else if(kind==="bat"){           // squeaks
+    [0,0.14,0.34].forEach(d=>blip("sine",4200,6800,t+d,0.09,0.14,9000));
+    blip("sine",7000,3200,t+0.5,0.16,0.12,9000);
+  }
+}
+function animalSound(id){
+  const a=ANIMAL[id]; if(!a) return;
+  const [kind,emoji,word]=a;
+  const pop=document.createElement("div");pop.className="animalpop";
+  pop.innerHTML=`<div class="em">${emoji}</div><div class="wd">${word}</div>`;
+  document.body.appendChild(pop);setTimeout(()=>pop.remove(),1700);
+  setTimeout(()=>{
+    try{
+      const au=new Audio("audio/sfx-"+kind+".mp3");
+      au.onerror=()=>{try{synthAnimal(kind);}catch(e){}};
+      au.play().catch(()=>{try{synthAnimal(kind);}catch(e){}});
+    }catch(e){try{synthAnimal(kind);}catch(_){}}
+  },250);
+}
+
+/* ---------- Background lullaby (original, generated music-box melody) ---------- */
+let musicOn=true, musicTimer=null, musicGain=null, musicBus=null, mStep=0;
+const C5=523.25,D5=587.33,E5=659.25,G5=783.99,A5=880, C4=261.63,G3=196, A3=220, F3=174.61;
+// 32-step slow pentatonic lullaby (0 = rest)
+const MELODY=[E5,0,G5,0,A5,0,G5,0,  E5,0,D5,0,C5,0,D5,0,
+              E5,0,G5,0,E5,0,D5,0,  C5,0,D5,0,E5,0,0,0];
+const BASS={0:C4,8:A3,16:F3,24:G3};
+function musicNote(freq,when,dur,vol,type){
+  const c=actx,o=c.createOscillator(),g=c.createGain();
+  o.type=type||"sine";o.frequency.value=freq;
+  g.gain.setValueAtTime(0.0001,when);
+  g.gain.exponentialRampToValueAtTime(vol,when+0.03);
+  g.gain.exponentialRampToValueAtTime(0.0001,when+dur);
+  o.connect(g);g.connect(musicBus);o.start(when);o.stop(when+dur+0.05);
+}
+function startMusic(){
+  if(!musicOn||musicTimer) return;
+  try{
+    const c=getCtx();
+    musicGain=c.createGain();musicGain.gain.value=0.0001;musicGain.connect(c.destination);
+    musicGain.gain.exponentialRampToValueAtTime(0.09,c.currentTime+3);
+    musicBus=c.createGain();musicBus.connect(musicGain);
+    const d=c.createDelay();d.delayTime.value=0.5;
+    const fb=c.createGain();fb.gain.value=0.38;
+    musicBus.connect(d);d.connect(fb);fb.connect(d);d.connect(musicGain);
+    musicTimer=setInterval(()=>{
+      const t=actx.currentTime+0.05, i=mStep%MELODY.length;
+      if(MELODY[i]) musicNote(MELODY[i],t,1.8,0.5,"sine");
+      if(MELODY[i]) musicNote(MELODY[i]*2,t,0.9,0.08,"triangle");   // sparkle
+      if(BASS[i]) musicNote(BASS[i],t,3.6,0.45,"triangle");
+      mStep++;
+    },650);
+  }catch(e){}
+}
+function stopMusic(){
+  if(musicTimer){clearInterval(musicTimer);musicTimer=null;}
+  try{ if(musicGain){const g=musicGain;g.gain.cancelScheduledValues(actx.currentTime);g.gain.setTargetAtTime(0.0001,actx.currentTime,0.4);setTimeout(()=>{try{g.disconnect();}catch(e){}},2000);musicGain=null;} }catch(e){}
+}
+document.addEventListener("visibilitychange",()=>{ if(document.hidden) stopMusic(); else if(musicOn && started) startMusic(); });
+let started=false;
+
+/* ---------- Screens ---------- */
+function showIntro(){
+  step=0;setProgress();app.innerHTML="";
+  const c=h(`<section class="card">
+    <div class="scene">🐘🌙</div>
+    <h1>Tula's Midnight Jungle Adventure</h1>
+    <p class="sub">A bedtime story where YOU help Tula the baby elephant choose the way and discover amazing jungle facts.</p>
+    <p class="story" style="text-align:center">Answer questions to win ⭐ and a candy and confetti shower! Ready?</p>
+    <div class="row"><button class="big" id="go">Start the story ✨</button></div>
+  </section>`);
+  app.appendChild(c);
+  c.querySelector("#go").onclick=()=>{started=true;startMusic();go("jungle");};
+}
+
+function showNode(id){
+  const n=nodes[id];usedHint=false;app.innerHTML="";
+  const c=h(`<section class="card">
+    <div class="scene">${n.scene}</div>
+    <h2>${n.title}</h2>
+    <p class="story">${n.text}</p>
+    <div id="slot"></div>
+  </section>`);
+  app.appendChild(c);
+  const slot=c.querySelector("#slot");
+
+  if(n.choices){
+    const row=h(`<div class="row"></div>`);
+    n.choices.forEach(ch=>{
+      const b=h(`<button class="big ${ch.cls||""}">${ch.t}</button>`);
+      b.onclick=()=>go(ch.next);row.appendChild(b);
+    });
+    slot.appendChild(row);return;
+  }
+
+  const q=h(`<div class="q"><h3>🧠 ${n.q.ask}</h3><div class="opts"></div><div class="hint" id="hint"></div></div>`);
+  const opts=q.querySelector(".opts");
+  shuffle(n.q.options).forEach(o=>{
+    const b=h(`<button class="opt">${o.t}</button>`);
+    b.onclick=()=>{
+      if(o.ok){
+        b.classList.add("right");
+        opts.querySelectorAll("button").forEach(x=>x.disabled=true);
+        q.querySelector("#hint").textContent="";
+        const first=!usedHint;
+        if(first){stars++;updateStars();}
+        shower(first);
+        animalSound(id);
+        const f=h(`<div class="fact"><b>💡 ${n.fact.h}</b>${n.fact.t}</div>`);
+        const nx=h(`<div class="row"><button class="big">Continue the story →</button></div>`);
+        nx.querySelector("button").onclick=()=>go(n.next);
+        slot.appendChild(f);slot.appendChild(nx);
+        f.scrollIntoView({behavior:"smooth",block:"center"});
+        if(autoRead) setTimeout(()=>narrate(id+"-fact",(first?"Yay! You got it! ":"Good job! ")+"Did you know? "+n.fact.t),1700);
+      }else{
+        usedHint=true;b.classList.add("wrong");
+        const hint=o.hint||"Not quite. Try again!";
+        q.querySelector("#hint").textContent="💭 "+hint;
+        if(autoRead) speak(hint);
+      }
+    };
+    opts.appendChild(b);
+  });
+  slot.appendChild(q);
+}
+
+function showEnd(){
+  step=TOTAL_STEPS;setProgress();app.innerHTML="";
+  const total=4;
+  const msg = stars===total ? "You got every question right on the first try. Wow!" :
+              stars>=2 ? "Great job! You learned lots of new things tonight." :
+              "You kept trying and learned something new. That's what explorers do!";
+  const c=h(`<section class="card">
+    <div class="scene">😴🏡</div>
+    <h2>Goodnight, Tula...</h2>
+    <p class="story">Tula snuggled up next to her big, warm grandma. The moon smiled, the frogs hummed a soft lullaby, and the fruit bats planted their seeds far away. \"Tonight I learned that the jungle is full of wonders,\" Tula whispered. Then she closed her sleepy eyes, and soon she was snoring, just like the rest of the herd. Goodnight!</p>
+    <div class="fact"><b>💤 Sleepy fact</b>While you sleep, your body rests and your brain sorts out everything you learned that day. Sleep helps kids grow, too!</div>
+    <div class="score">${"⭐".repeat(stars)}${"☆".repeat(total-stars)}</div>
+    <p class="sub"><span class="badge">🌟 Jungle Night Explorer</span></p>
+    <p class="sub">${msg}</p>
+    <div class="row"><button class="big" id="again">Read again 🔁</button></div>
+  </section>`);
+  app.appendChild(c);
+  c.querySelector("#again").onclick=()=>{stars=0;updateStars();go("intro");};
+  shower(true);
+  animalSound("end");
+  if(autoRead) setTimeout(()=>narrate("end",cardText()),1800);
+}
+
+/* ---------- Router ---------- */
+const stepOf={jungle:1,choose:2,treetops:3,river:3,bats:4,herd:5};
+function go(id){
+  stopSpeak(); curKey=id;
+  window.scrollTo({top:0,behavior:"smooth"});
+  if(id==="intro") return showIntro();
+  if(id==="end") return showEnd();
+  step=stepOf[id]||step;setProgress();
+  showNode(id);
+  if(autoRead) setTimeout(()=>narrate(id,cardText()),400);
+}
+
+/* ---------- Buttons ---------- */
+document.getElementById("readBtn").onclick=()=>narrate(curKey,cardText());
+document.getElementById("autoBtn").onclick=function(){
+  autoRead=!autoRead;this.classList.toggle("on",autoRead);
+  this.textContent="🗣️ Auto-read: "+(autoRead?"on":"off");
+  if(!autoRead) stopSpeak();
+};
+document.getElementById("musicBtn").onclick=function(){
+  musicOn=!musicOn;this.classList.toggle("on",musicOn);
+  this.textContent="🎵 Music: "+(musicOn?"on":"off");
+  if(musicOn){started=true;startMusic();} else stopMusic();
+};
+document.getElementById("dimBtn").onclick=function(){
+  document.body.classList.toggle("dim");
+  this.textContent=document.body.classList.contains("dim")?"💡 Lights on":"🕯️ Dim lights";
+};
+
+updateStars();
+showIntro();
+</script>
+</body>
+</html>
